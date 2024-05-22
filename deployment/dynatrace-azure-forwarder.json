@@ -303,7 +303,7 @@
                 "networkAcls": {
                     "bypass": "AzureServices",
                     "virtualNetworkRules": "[if(parameters('deployActiveGateContainer'), json(concat('[{ \"id\": \"', variables('functionSubnetId'), '\" }]')), json('null'))]",
-                    "defaultAction": "Allow"
+                    "defaultAction": "Deny"
                 },
                 "supportsHttpsTrafficOnly": true,
                 "allowBlobPublicAccess": false,
@@ -473,7 +473,7 @@
                 "hostNamesDisabled": false,
                 "containerSize": 1536,
                 "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false,
+                "httpsOnly": true,
                 "redundancyMode": "None"
             },
             "resources": [
