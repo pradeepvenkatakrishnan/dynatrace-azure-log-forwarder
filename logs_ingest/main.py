@@ -77,8 +77,8 @@ def process_logs(events: List[func.EventHubEvent], self_monitoring: SelfMonitori
 
 
 def verify_dt_access_params_provided():
-    if DYNATRACE_URL not in os.environ.keys() or DYNATRACE_ACCESS_KEY not in os.environ.keys():
-        raise Exception(f"Please set {DYNATRACE_URL} and {DYNATRACE_ACCESS_KEY} in application settings")
+    if DYNATRACE_URL not in os.environ or DYNATRACE_ACCESS_KEY not in os.environ:
+        raise KeyError(f"Please set {DYNATRACE_URL} and {DYNATRACE_ACCESS_KEY} in application settings")
 
 
 def extract_logs(events: List[func.EventHubEvent], self_monitoring: SelfMonitoring):
@@ -128,7 +128,9 @@ def is_too_old(timestamp: str, self_monitoring: SelfMonitoring, log_part: str):
     if timestamp:
         try:
             date = parser.parse(timestamp)
-            # LINT won't accept any log line older than one day, 60 seconds of margin to send
+            if not date.tzinfo:
+                date=date.replace(tzinfo=timezone.utc)
+            # Logs Ingest API won't accept any log line older than one day, 60 seconds of margin to send
             if (datetime.now(timezone.utc) - date).total_seconds() > (record_age_limit - 60):
                 logging.info(f"Skipping too old {log_part} with timestamp '{timestamp}'")
                 self_monitoring.too_old_records += 1
